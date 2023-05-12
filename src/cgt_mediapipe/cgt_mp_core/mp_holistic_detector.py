@@ -42,9 +42,7 @@ class HolisticDetector(mp_detector_node.DetectorNode):
         return [[r_hand, l_hand], [face], pose]
 
     def contains_features(self, mp_res):
-        if not mp_res.pose_landmarks:
-            return False
-        return True
+        return bool(mp_res.pose_landmarks)
 
     def draw_result(self, s, mp_res, mp_drawings):
         mp_drawings.draw_landmarks(
@@ -70,9 +68,7 @@ if __name__ == '__main__':
     detection_type = "image"
     detector = HolisticDetector(cv_stream.Stream(0))
 
-    frame = 0
-    for _ in range(15):
-        frame += 1
+    for frame, _ in enumerate(range(15), start=1):
         detector.update(None, frame)
 
     del detector

@@ -28,7 +28,6 @@ class BpyOutputNode(cgt_nodes.OutputNode):
 
         except IndexError:
             logging.debug(f"missing translation index at {frame}")
-            pass
 
     @staticmethod
     def scale(target, data, frame):
@@ -38,7 +37,6 @@ class BpyOutputNode(cgt_nodes.OutputNode):
                 target[landmark[0]].keyframe_insert(data_path="scale", frame=frame)
         except IndexError:
             logging.debug(f"missing scale index at {data}, {frame}")
-            pass
 
     @staticmethod
     def quaternion_rotate(target, data, frame):
@@ -49,7 +47,6 @@ class BpyOutputNode(cgt_nodes.OutputNode):
                 target[landmark[0]].keyframe_insert(data_path="rotation_quaternion", frame=frame)
         except IndexError:
             logging.debug(f"missing quat_euler_rotate index {data}, {frame}")
-            pass
 
     def euler_rotate(self, target, data, frame, idx_offset=0):
         """ Translates and keyframes bpy empty objects. """
@@ -60,4 +57,3 @@ class BpyOutputNode(cgt_nodes.OutputNode):
                 self.prev_rotation[landmark[0] + idx_offset] = landmark[1]
         except IndexError:
             logging.debug(f"missing euler_rotate index at {data}, {frame}")
-            pass

@@ -10,11 +10,7 @@ That's proto classes for every Property Group are required to gather values from
 
 # region pools and dynamic enums
 def pool_transfer_target(self, obj):
-    if obj.type == self.obj_type:
-        return True
-    elif self.obj_type == 'ANY':
-        return True
-    return False
+    return obj.type == self.obj_type or self.obj_type == 'ANY'
 
 
 def get_shape_key_enum(self, context):
@@ -41,9 +37,7 @@ def get_bones_enum(self, context):
 
 
 def is_armature(self, obj):
-    if obj.type == 'ARMATURE':
-        return True
-    return False
+    return obj.type == 'ARMATURE'
 # endregion
 
 

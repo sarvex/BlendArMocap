@@ -26,9 +26,7 @@ class PoseDetector(mp_detector_node.DetectorNode):
         return []
 
     def contains_features(self, mp_res):
-        if not mp_res.pose_world_landmarks:
-            return False
-        return True
+        return bool(mp_res.pose_world_landmarks)
 
     def draw_result(self, s, mp_res, mp_drawings):
         mp_drawings.draw_landmarks(

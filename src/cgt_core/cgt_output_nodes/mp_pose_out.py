@@ -11,10 +11,7 @@ class MPPoseOutputNode(mp_out_utils.BpyOutputNode):
 
     def __init__(self):
         data = cgt_defaults
-        references = {}
-        for k, v in data.pose.items():
-            references[k] = v
-
+        references = dict(data.pose.items())
         self.pose = cgt_bpy_utils.add_empties(references, 0.005, suffix='cgt_')
         for ob in self.pose:
             cgt_object_prop.set_custom_property(ob, "cgt_id", data.identifier)

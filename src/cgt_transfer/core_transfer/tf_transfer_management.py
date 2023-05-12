@@ -138,7 +138,7 @@ def link_object_chain(chains_dict: Dict[bpy.types.Object, dict]):
             # next chain link
             apply_chain_link(chain_link_dict[current_obj], current_obj, driver_target)
 
-    for chain_obj in chains_dict.keys():
+    for chain_obj in chains_dict:
         # get props for chain start
         properties = tf_get_object_properties.get_properties_from_object(chain_obj)
         target_obj, sub_target, target_type = tf_get_object_properties.get_target(properties.target)
@@ -157,9 +157,9 @@ def link_object_chain(chains_dict: Dict[bpy.types.Object, dict]):
 def get_driver_target(obj: bpy.types.Object) -> bpy.types.Object:
     """ Returns a driver factory which uses an obj based on the name of the input obj.
         Deletes driver object of the same name if it exists. """
-    if obj.name + '.D' in bpy.data.objects:
-        bpy.data.objects.remove(bpy.data.objects[obj.name + '.D'])
-    driver_target = cgt_bpy_utils.add_empty(0.001, obj.name + '.D', 'SPHERE')
+    if f'{obj.name}.D' in bpy.data.objects:
+        bpy.data.objects.remove(bpy.data.objects[f'{obj.name}.D'])
+    driver_target = cgt_bpy_utils.add_empty(0.001, f'{obj.name}.D', 'SPHERE')
     cgt_collection.add_object_to_collection('cgt_DRIVERS', driver_target)
     return driver_target
 

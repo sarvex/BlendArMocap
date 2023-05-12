@@ -34,13 +34,7 @@ def vector_length_2d(v1, v2, del_axis: str = ""):
 def get_vector_distance(v1, v2):
     """ return distance between two points. """
     sqrd_dist = np.sum((v1 - v2) ** 2, axis=0)
-    dist = np.sqrt(sqrd_dist)
-    # return math.sqrt(
-    #     (v2[0] - v1[0]) ** 2 +
-    #     (v2[1] - v1[1]) ** 2 +
-    #     (v2[2] - v1[2]) ** 2
-    # )
-    return dist
+    return np.sqrt(sqrd_dist)
 
 
 # region axis helper
@@ -54,8 +48,7 @@ def remove_axis(vectors, *args):
     res = []
     for arg in args:
         try:
-            for vec in vectors:
-                res.append([np.delete(vec, axis[arg]) for arg in args])
+            res.extend([np.delete(vec, axis[arg]) for arg in args] for vec in vectors)
         except KeyError:
             pass
 
@@ -72,7 +65,7 @@ def null_axis(vectors, *args):
     res = []
 
     for vec in vectors:
-        tmp = [v for v in vec]
+        tmp = list(vec)
         for arg in args:
             tmp[axis[arg]] = 0
         res.append(tmp)
@@ -87,9 +80,7 @@ def null_axis(vectors, *args):
 def project_vec_on_vec(target, destination):
     # project vector u on vector v
     v_norm = vector_length(target)
-    # find dot product using np.dot()
-    proj_of_u_on_v = (np.dot(destination, target) / v_norm ** 2) * target
-    return proj_of_u_on_v
+    return (np.dot(destination, target) / v_norm ** 2) * target
 
 
 def project_point_on_vector(proj_point, a, b):
@@ -97,8 +88,7 @@ def project_point_on_vector(proj_point, a, b):
     # A + dot(AP,AB) / dot(AB,AB) * AB
     ap = to_vector(a, proj_point)
     ab = to_vector(a, b)
-    proj = a + np.dot(ap, ab) / np.dot(ab, ab) * ab
-    return proj
+    return a + np.dot(ap, ab) / np.dot(ab, ab) * ab
 
 
 def project_vec_on_plane(triangle: np.array, faces: np.array, vec: np.array):
@@ -108,8 +98,7 @@ def project_vec_on_plane(triangle: np.array, faces: np.array, vec: np.array):
     :param vec - vector to project
     return projection vector"""
     normals, norm = create_normal_array(triangle, faces)
-    projection = project_vec_from_normal(normals[0], np.array(vec))
-    return projection
+    return project_vec_from_normal(normals[0], np.array(vec))
 
 
 def project_vec_from_normal(normal, vector):
@@ -139,8 +128,7 @@ def rotate_towards(origin, destination, track='Z', up='Y'):
     """ returns rotation from an origin to a destination. """
     vec = Vector((destination - origin))
     vec = vec.normalized()
-    quart = vec.to_track_quat(track, up)
-    return quart
+    return vec.to_track_quat(track, up)
 
 
 def m_rotate_towards(eye: np.array, target: np.array):
@@ -154,23 +142,21 @@ def m_rotate_towards(eye: np.array, target: np.array):
         axis_x = np.array((1, 0, 0))
 
     axis_y = np.cross(axis_z, axis_x)
-    rot_matrix = np.matrix([axis_x, axis_y, axis_z]).transpose()
-    return rot_matrix
+    return np.matrix([axis_x, axis_y, axis_z]).transpose()
 
 
 # region joint
 def joint_angles(vertices, joints):
     """ get multiple angles. """
-    angles = [joint_angle(vertices, joint) for joint in joints]
-    return angles
+    return [joint_angle(vertices, joint) for joint in joints]
 
 
 def joint_angle(vertices, joint):
     """ returns angles between joints. """
-    angle = angle_between(
+    return angle_between(
         to_vector(vertices[joint[0]], vertices[joint[1]]),
-        to_vector(vertices[joint[1]], vertices[joint[2]]))
-    return angle
+        to_vector(vertices[joint[1]], vertices[joint[2]]),
+    )
 
 
 # endregion
@@ -212,8 +198,7 @@ def intersection_2d_vectors(origin_p1: np.array, target_p1: np.array,
     target_p1 = np.delete(target_p1, axis[del_axis])
     origin_p2 = np.delete(origin_p2, axis[del_axis])
     target_p2 = np.delete(target_p2, axis[del_axis])
-    intersection = seg_intersect(origin_p1, target_p1, origin_p2, target_p2)
-    return intersection
+    return seg_intersect(origin_p1, target_p1, origin_p2, target_p2)
 
 
 def rotate_seg(a):
@@ -255,8 +240,7 @@ def create_angled_circle(center, radius, angle=90, points=10):
     y = center[1] + y * np.sin(phi) * radius
     z = center[2] + z * radius
 
-    circle = [[x[i], y[i], z[i]] for i in range(0, len(x))]
-    return circle
+    return [[x[i], y[i], z[i]] for i in range(0, len(x))]
 
 
 def circle_along_UV(center=np.array([0, 0, 0]),
@@ -278,8 +262,7 @@ def circle_along_UV(center=np.array([0, 0, 0]),
     y = center[1] + r * U[1] * cos_t + r * V[1] * sin_t
     z = center[2] + r * U[2] * cos_t + r * V[2] * sin_t
 
-    circle = [[x[i], y[i], z[i]] for i in range(0, len(x))]
-    return circle
+    return [[x[i], y[i], z[i]] for i in range(0, len(x))]
 
 
 def create_circle_around_vector(vector, center, radius, points, normal=None):
@@ -301,8 +284,7 @@ def create_circle_around_vector(vector, center, radius, points, normal=None):
         U = normal
 
     V = np.cross(Q, U)
-    circle = circle_along_UV(center, U, V, radius, points)
-    return circle
+    return circle_along_UV(center, U, V, radius, points)
 
 
 # endregion
@@ -359,8 +341,7 @@ def rotate_point(point, axis, angle):
     rotation_matrix = np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
                                 [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
                                 [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
-    loc = np.dot(rotation_matrix, point)
-    return loc
+    return np.dot(rotation_matrix, point)
 
 
 # endregion
@@ -370,14 +351,12 @@ def rotate_point(point, axis, angle):
 def distance_from_plane(point, normal, plane_point):
     """ returns the distance of a point to a plane using the normal
         of the plane and a random point from the plane """
-    d = np.sum(np.dot(point - plane_point, normal))
-    return d
+    return np.sum(np.dot(point - plane_point, normal))
 
 
 def normal_from_plane(plane):
     """ get the normal from a plane """
-    normal = np.cross(plane[1] - plane[0], plane[2] - plane[0])
-    return normal
+    return np.cross(plane[1] - plane[0], plane[2] - plane[0])
 
 
 # https://github.com/vladmandic/human/pull/91
@@ -423,8 +402,7 @@ def decompose_matrix(matrix: Matrix) -> (Vector, Quaternion, Vector):
 
 def to_euler(quart, combat=Euler(), space='XYZ') -> Euler:
     """ quaternion to euler using mathutils """
-    euler = quart.to_euler(space, combat)
-    return euler
+    return quart.to_euler(space, combat)
 
 
 def quart_to_euler_combat(quart, idx, idx_offset=0, axis='XYZ', prev_rotation=None) -> Euler:
@@ -441,19 +419,20 @@ def quart_to_euler_combat(quart, idx, idx_offset=0, axis='XYZ', prev_rotation=No
 
 def offset_euler(euler, offset: []) -> Euler:
     """ Offsets an euler rotation using euler radians *pi. """
-    rotation = Euler((
-        euler[0] + np.pi * offset[0],
-        euler[1] + np.pi * offset[1],
-        euler[2] + np.pi * offset[2],
-    ))
-    return rotation
+    return Euler(
+        (
+            euler[0] + np.pi * offset[0],
+            euler[1] + np.pi * offset[1],
+            euler[2] + np.pi * offset[2],
+        )
+    )
 
 
 def try_get_euler(quart_rotation, offset: [], prev_rot_idx: int = -1, prev_rotation=None):
     """ Gets an euler rotation from quaternion with using the previously
         created rotation as combat to avoid discontinuity. """
     try:
-        if offset == None:
+        if offset is None:
             m_rot = to_euler(
                 quart_rotation,
                 prev_rotation[prev_rot_idx]
@@ -477,12 +456,14 @@ def try_get_euler(quart_rotation, offset: [], prev_rot_idx: int = -1, prev_rotat
 def _generate_matrix(tangent: np.array, normal: np.array, binormal: np.array):
     # not tested
     """ generate a numpy matrix at loc [0, 0, 0]. """
-    matrix = np.array([
-        [tangent[0], tangent[1], tangent[2], 0],
-        [normal[0], normal[1], normal[2], 0],
-        [binormal[0], binormal[1], binormal[2], 0],
-        [0, 0, 0, 1]])
-    return matrix
+    return np.array(
+        [
+            [tangent[0], tangent[1], tangent[2], 0],
+            [normal[0], normal[1], normal[2], 0],
+            [binormal[0], binormal[1], binormal[2], 0],
+            [0, 0, 0, 1],
+        ]
+    )
 
 
 def _decompose_matrix(matrix: np.matrix):
@@ -526,8 +507,7 @@ def euler_to_quaternion(yaw, pitch, roll):
     y = cr * sp * cy + sr * cp * sy
     z = cr * cp * sy - sr * sp * cy
 
-    quart = np.array([w, z, y, x])
-    return quart
+    return np.array([w, z, y, x])
 
 
 def quaternion_to_euler(q: np.array) -> np.array:
@@ -542,18 +522,13 @@ def quaternion_to_euler(q: np.array) -> np.array:
 
     # y axis pitch
     sinp = 2 * (q[0] * q[1] - q[3] * q[1])
-    if abs(sinp) >= 1:
-        pitch = np.copysign(np.pi / 2, sinp)  # use 90 degrees if out of range
-    else:
-        pitch = np.asin(sinp)
-
+    pitch = np.copysign(np.pi / 2, sinp) if abs(sinp) >= 1 else np.asin(sinp)
     # z axis yaw
     siny_cosp = 2 * (q[0] * q[3] + q[1] * q[2])
     cosy_cosp = 1 - 2 * (q[2] * q[2] + q[3] * q[3])
     yaw = np.atan2(siny_cosp, cosy_cosp)
 
-    angles = np.array(pitch, yaw, roll)
-    return angles
+    return np.array(pitch, yaw, roll)
 
 
 def matrix3x3_to_quaternion(m: np.matrix):
@@ -566,13 +541,12 @@ def matrix3x3_to_quaternion(m: np.matrix):
         else:
             t = 1 - m[0, 0] + m[1, 1] - m[2, 2]
             q = [m[0, 1] + m[1, 0], t, m[1, 2] + m[2, 1], m[2, 0] - m[0, 2]]
+    elif m[0, 0] < -m[1, 1]:
+        t = 1 - m[0, 0] - m[1, 1] + m[2, 2]
+        q = [m[2, 0] + m[0, 2], m[1, 2] + m[2, 1], t, m[0, 1] - m[1, 0]]
     else:
-        if m[0, 0] < -m[1, 1]:
-            t = 1 - m[0, 0] - m[1, 1] + m[2, 2]
-            q = [m[2, 0] + m[0, 2], m[1, 2] + m[2, 1], t, m[0, 1] - m[1, 0]]
-        else:
-            t = 1 + m[0, 0] + m[1, 1] + m[2, 2]
-            q = [m[1, 2] - m[2, 1], m[2, 0] - m[0, 2], m[0, 1] - m[1, 0], t]
+        t = 1 + m[0, 0] + m[1, 1] + m[2, 2]
+        q = [m[1, 2] - m[2, 1], m[2, 0] - m[0, 2], m[0, 1] - m[1, 0], t]
 
     # x y z w
     q = [e * (.5 / np.sqrt(t)) for e in q]

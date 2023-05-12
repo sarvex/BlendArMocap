@@ -15,11 +15,7 @@ class LoadFreemocapSession:
             Attention: May not use the WM_Load_Freemocap_Operator.
             Modal operations deliver unexpected results when blender is in background. """
 
-        # set timeout
-        self.timeout = timeout
-        if timeout is None:
-            self.timeout = float('inf')
-
+        self.timeout = float('inf') if timeout is None else timeout
         # set session path
         self.user = bpy.context.scene.cgtinker_freemocap
         self.user.freemocap_session_path = session_path

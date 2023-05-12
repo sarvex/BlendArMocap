@@ -14,11 +14,9 @@ class OBJECT_PT_BlendArMocapTransfer(bpy.types.Panel):
     obj_prop: bpy.props.PointerProperty(type=bpy.types.Object)
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         # return context.object.cgt_props.active
-        if context.object.get("cgt_id") == "11b1fb41-1349-4465-b3aa-78db80e8c761":
-            return True
-        return False
+        return context.object.get("cgt_id") == "11b1fb41-1349-4465-b3aa-78db80e8c761"
 
     def draw(self, context):
         pass
@@ -150,9 +148,6 @@ class OBJECT_PT_CGT_DriverProperties(bpy.types.Panel):
                                 text="To Bone")
                 col.prop(ob.cgt_props.by_obj, "other_bone_type", text="Type")
 
-        else:
-            pass
-
 
 class OBJECT_PT_CGT_DriverPropertyDetails(bpy.types.Panel):
     """ Driver remap property details. """
@@ -163,13 +158,11 @@ class OBJECT_PT_CGT_DriverPropertyDetails(bpy.types.Panel):
     bl_region_type = 'WINDOW'
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         ob = context.object
         if ob is None:
             return False
-        if ob.cgt_props.driver_type in ['REMAP', 'REMAP_DIST']:
-            return True
-        return False
+        return ob.cgt_props.driver_type in ['REMAP', 'REMAP_DIST']
 
     def draw(self, context):
         layout = self.layout
@@ -191,19 +184,19 @@ class OBJECT_PT_CGT_DriverPropertyDetails(bpy.types.Panel):
 
             row = col.row(align=True)
             sub = row.column(align=True)
-            sub.prop(group, "from_min", text=f"From Min", toggle=True)
-            sub.prop(group, "from_max", text=f"From Max")
+            sub.prop(group, "from_min", text="From Min", toggle=True)
+            sub.prop(group, "from_max", text="From Max")
 
             row = col.row(align=True)
             sub = row.column(align=True)
-            sub.prop(group, "to_min", text=f"To Min", toggle=True)
-            sub.prop(group, "to_max", text=f"To Max")
+            sub.prop(group, "to_min", text="To Min", toggle=True)
+            sub.prop(group, "to_max", text="To Max")
             col.separator()
 
             row = col.row(align=True)
             sub = row.column(align=True)
-            sub.prop(group, "offset", text=f"Offset", toggle=True)
-            sub.prop(group, "factor", text=f"Factor")
+            sub.prop(group, "offset", text="Offset", toggle=True)
+            sub.prop(group, "factor", text="Factor")
             col.separator()
 
         def detailed_properties(identifieres, groups, remap_type="remap_details"):
@@ -223,8 +216,9 @@ class OBJECT_PT_CGT_DriverPropertyDetails(bpy.types.Panel):
             row.label(icon='BLANK1')
             if getattr(ob.cgt_props, details[0], False):
                 detailed_properties(['X', 'Y', 'Z'], [prop[0] for prop in props], details[1])
-            elif any([prop[0].active for prop in props]):
+            elif any(prop[0].active for prop in props):
                 draw_props("", props[0][0], details[2])
+
 
 
         loc_props = [

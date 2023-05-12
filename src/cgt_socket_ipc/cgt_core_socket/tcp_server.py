@@ -32,25 +32,23 @@ class Server(object):
 
     def handle(self):
         while self.conn:
-            # only send and recv if socket selectable (3s timeout)
-            if select.select([self.conn], [], [], 3):
-                payload = self.conn.recv(self.buffer)
-                if payload:
-                    # usually sends payload for verification
-                    # requires parsing on client side
-                    if select.select([], [self.conn], [], 3):
-                        self.conn.send(self.resp)
-
-                    # parse the decoded chunk and res in queue
-                    chunk = payload.decode("utf-8")
-                    self.parser.exec(chunk)
-
-                if not payload:
-                    # Client stopped writing
-                    break
-
-            else:
+            if not select.select([self.conn], [], [], 3):
                 # Timeout occurred
+                break
+
+            payload = self.conn.recv(self.buffer)
+            if payload:
+                # usually sends payload for verification
+                # requires parsing on client side
+                if select.select([], [self.conn], [], 3):
+                    self.conn.send(self.resp)
+
+                # parse the decoded chunk and res in queue
+                chunk = payload.decode("utf-8")
+                self.parser.exec(chunk)
+
+            if not payload:
+                # Client stopped writing
                 break
 
         self.shutdown()

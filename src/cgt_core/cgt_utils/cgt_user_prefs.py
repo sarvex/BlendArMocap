@@ -6,10 +6,7 @@ from typing import Any
 def get_prefs(**kwargs) -> dict:
     """ Kwargs as key and default value. Ensure to use unique keys (check json if necessary). """
     data = cgt_json.JsonData(PREFERENCES_PATH)
-    d = {}
-    for key, default in kwargs.items():
-        d[key] = getattr(data, key, default)
-    return d
+    return {key: getattr(data, key, default) for key, default in kwargs.items()}
 
 
 def set_prefs(**kwargs) -> None:

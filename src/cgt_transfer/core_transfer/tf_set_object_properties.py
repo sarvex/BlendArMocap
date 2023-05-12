@@ -11,9 +11,9 @@ from ...cgt_core.cgt_bpy import cgt_drivers, cgt_bpy_utils
 def update_driver_target(obj: bpy.types.Object):
     """ Returns an object which may be used as driver target.
         Deletes object of the same name if it exists. """
-    if obj.name + '.D' in bpy.data.objects:
-        bpy.data.objects.remove(bpy.data.objects[obj.name + '.D'])
-    return cgt_bpy_utils.add_empty(0.1, obj.name + '.D', 'SPHERE')
+    if f'{obj.name}.D' in bpy.data.objects:
+        bpy.data.objects.remove(bpy.data.objects[f'{obj.name}.D'])
+    return cgt_bpy_utils.add_empty(0.1, f'{obj.name}.D', 'SPHERE')
 
 
 def set_constraint_props(constraint: bpy.types.Constraint, props: dict):

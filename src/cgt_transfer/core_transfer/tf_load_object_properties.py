@@ -36,7 +36,7 @@ def idle_object_props(props):
 
 def apply_props2obj(props: dict, obj: Union[bpy.types.Object, bpy.types.Constraint], target_armature: bpy.types.Object = None):
     """ Apply CGT_Object_Properties stored state. """
-    if obj == {} or props == {} or target_armature is None:
+    if obj == {} or not props or target_armature is None:
         return
 
     for key, value in props.items():
@@ -47,28 +47,27 @@ def apply_props2obj(props: dict, obj: Union[bpy.types.Object, bpy.types.Constrai
             # obj types are declared at 2nd idx in a list
             if len(value) != 2:
                 setattr(obj, key, value)
+            elif value[1] == 'ARMATURE':
+                setattr(obj, key, target_armature)
+
+            elif value[1] in ['EMPTY', 'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',
+                              'POINTCLOUD', 'VOLUME', 'GPENCIL', 'LATTICE', 'LIGHT',
+                              'LIGHT_PROBE', 'CAMERA', 'SPEAKER', 'CURVES']:
+                # handling default objects and other kinds of ptrs
+                if cgt_bpy_utils.get_object_by_name(value[0]) is None:
+                    logging.warning(f"Object of type {value[1]} doesn't exist - creating {value[1]} as EMPTY.")
+
+                # adding id as it might be required in some cases and hopefully doesn't matter in others
+                target = cgt_bpy_utils.add_empty(0.25, value[0])
+                cgt_object_prop.set_custom_property(target, 'cgt_id', '11b1fb41-1349-4465-b3aa-78db80e8c761')
+
+                try:
+                    setattr(obj, key, target)
+                except AttributeError as err:
+                    logging.warning(err)
+
             else:
-                if value[1] == 'ARMATURE':
-                    setattr(obj, key, target_armature)
-
-                elif value[1] in ['EMPTY', 'MESH', 'CURVE', 'SURFACE', 'META', 'FONT',
-                                  'POINTCLOUD', 'VOLUME', 'GPENCIL', 'LATTICE', 'LIGHT',
-                                  'LIGHT_PROBE', 'CAMERA', 'SPEAKER', 'CURVES']:
-                    # handling default objects and other kinds of ptrs
-                    if cgt_bpy_utils.get_object_by_name(value[0]) is None:
-                        logging.warning(f"Object of type {value[1]} doesn't exist - creating {value[1]} as EMPTY.")
-
-                    # adding id as it might be required in some cases and hopefully doesn't matter in others
-                    target = cgt_bpy_utils.add_empty(0.25, value[0])
-                    cgt_object_prop.set_custom_property(target, 'cgt_id', '11b1fb41-1349-4465-b3aa-78db80e8c761')
-
-                    try:
-                        setattr(obj, key, target)
-                    except AttributeError as err:
-                        logging.warning(err)
-
-                else:
-                    logging.error(f"{value[1]} - Type not supported: {value[1]}.")
+                logging.error(f"{value[1]} - Type not supported: {value[1]}.")
 
         else:
             try:
@@ -79,7 +78,7 @@ def apply_props2obj(props: dict, obj: Union[bpy.types.Object, bpy.types.Constrai
 
 def apply_constraints(constraints: list, obj: bpy.types.Object, target_armature: bpy.types.Object):
     """ Add stored constraints to objects. """
-    if obj == {} or len(constraints) == 0:
+    if obj == {} or not constraints:
         return
 
     # storing constraints as list of [constraint_name, constraint_properties]

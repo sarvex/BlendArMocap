@@ -65,17 +65,14 @@ class Stream:
         return cv2.resize(self.frame, self.dim, interpolation=cv2.INTER_AREA)
 
     def draw(self):
-        f = self.frame
-        if self.is_movie:
-            f = self.resize_movie_frame()
+        f = self.resize_movie_frame() if self.is_movie else self.frame
         cv2.imshow(self.title, f)
 
     def exit_stream(self):
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            logging.debug("ATTEMPT TO EXIT STEAM")
-            return True
-        else:
+        if cv2.waitKey(1) & 0xFF != ord('q'):
             return False
+        logging.debug("ATTEMPT TO EXIT STEAM")
+        return True
 
     def set_capture(self, capture_input, backend):
         if isinstance(capture_input, int):

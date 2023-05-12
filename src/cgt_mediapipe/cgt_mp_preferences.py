@@ -15,7 +15,7 @@ class PREFERENCES_OT_CGT_install_dependencies_button(bpy.types.Operator):
     bl_options = {"REGISTER", "INTERNAL"}
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         return not all(cgt_dependencies.dependencies_installed)
 
     def execute(self, context):
@@ -42,7 +42,7 @@ class PREFERENCES_OT_CGT_uninstall_dependencies_button(bpy.types.Operator):
     bl_options = {"REGISTER", "INTERNAL"}
 
     @classmethod
-    def poll(self, context):
+    def poll(cls, context):
         return any(cgt_dependencies.dependencies_installed)
 
     def execute(self, context):
@@ -90,8 +90,8 @@ def draw(self, context):
         cols[3].label(text=f"{cgt_dependencies.is_installed(dependency)}")
         if not cgt_dependencies.is_installed(dependency):
             cols[0].label(text=f"{dependency.name}")
-            cols[1].label(text=f"NaN")
-            cols[2].label(text=f"NaN")
+            cols[1].label(text="NaN")
+            cols[2].label(text="NaN")
 
         else:
             version, path = cgt_dependencies.get_package_info(dependency)

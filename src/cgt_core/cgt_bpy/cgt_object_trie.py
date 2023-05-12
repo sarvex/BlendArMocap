@@ -79,14 +79,13 @@ def repr_dict(d: Dict[Any], trie_objects=True) -> str:
                 print(f"{tabs}{key}: {value}")
 
             if hasattr(branch, 'next'):
-                if not len(branch.next) > 0:
+                if len(branch.next) <= 0:
                     print(f"{tabs}{closing_bracelet},\n{tabs}{bracelet}")
                     return
 
                 print(f"{tabs}next:", branch.name, '{')
                 recv(branch.name, branch.next, depth + 1)
 
-        # get next dict entries
         elif isinstance(branch, dict):
             if not trie_objects:
                 print(f"{tabs}{name}:", '{')
@@ -313,9 +312,8 @@ class TrieObject:
             if v is None:
                 continue
 
-            if isinstance(v, list):
-                if v == [0, 0, 0]:
-                    continue
+            if isinstance(v, list) and v == [0, 0, 0]:
+                continue
 
             s.append(f"{k}: {v}, ")
 
@@ -334,7 +332,7 @@ def armature_from_default_dict():
     inline_converter(objects, distances, inline_calculate_distances)
 
     def add_prefix(copy: Dict[Any], name: str, _) -> Dict[Any]:
-        branch = copy[name + 'cgt'] = {}
+        branch = copy[f'{name}cgt'] = {}
         return branch
 
     target_names = {}
@@ -355,8 +353,8 @@ def armature_from_default_dict():
     for cur, parent in gen_parents(d):
         if parent is None:
             continue
-        c = cgt_bpy_utils.add_empty(0.1, cur + 'cgt')
-        p = cgt_bpy_utils.add_empty(0.1, parent + 'cgt')
+        c = cgt_bpy_utils.add_empty(0.1, f'{cur}cgt')
+        p = cgt_bpy_utils.add_empty(0.1, f'{parent}cgt')
         c.parent = p
 
     arm = objects2armature(targets)

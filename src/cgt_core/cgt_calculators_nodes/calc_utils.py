@@ -49,12 +49,13 @@ class ProcessorUtils:
         if offset is None:
             return euler
 
-        rotation = Euler((
-            euler[0] + np.pi * offset[0],
-            euler[1] + np.pi * offset[1],
-            euler[2] + np.pi * offset[2],
-        ))
-        return rotation
+        return Euler(
+            (
+                euler[0] + np.pi * offset[0],
+                euler[1] + np.pi * offset[1],
+                euler[2] + np.pi * offset[2],
+            )
+        )
 
     def try_get_euler(self, quart_rotation, offset: list = None, prev_rot_idx: int = None):
         """ Gets an euler rotation from quaternion with using the previously
@@ -74,8 +75,6 @@ class ProcessorUtils:
                 self.prev_rotation[prev_rot_idx]
             )
             self.prev_rotation[prev_rot_idx] = euler_rot
-            return self.prev_rotation[prev_rot_idx]
-
         else:
             tmp_offset = [-o for o in offset]
             euler_rot = cgt_math.to_euler(
@@ -84,5 +83,6 @@ class ProcessorUtils:
             )
 
             self.prev_rotation[prev_rot_idx] = self.offset_euler(euler_rot, offset)
-            return self.prev_rotation[prev_rot_idx]
+
+        return self.prev_rotation[prev_rot_idx]
 

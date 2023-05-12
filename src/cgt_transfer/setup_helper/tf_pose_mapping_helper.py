@@ -120,29 +120,28 @@ def get_arm_chain(prefix='.L'):
         raise ValueError
 
     shoulder = ChainElement(
-        obj=suffix + 'shoulder',
+        obj=f'{suffix}shoulder',
         parent=None,
-        target_bone='upper_arm_fk' + prefix,
+        target_bone=f'upper_arm_fk{prefix}',
         remap_bone='',
-        constraint={}
-    )
-
-    elbow = ChainElement(
-        obj=suffix + 'elbow',
-        parent=shoulder,
-        target_bone='forearm_tweak' + prefix,
-        remap_bone='upper_arm_fk' + prefix,
         constraint={},
     )
 
-    wrist = ChainElement(
-        obj=suffix + 'wrist',
+    elbow = ChainElement(
+        obj=f'{suffix}elbow',
+        parent=shoulder,
+        target_bone=f'forearm_tweak{prefix}',
+        remap_bone=f'upper_arm_fk{prefix}',
+        constraint={},
+    )
+
+    return ChainElement(
+        obj=f'{suffix}wrist',
         parent=elbow,
-        target_bone='hand_ik' + prefix,
-        remap_bone='forearm_fk' + prefix,
+        target_bone=f'hand_ik{prefix}',
+        remap_bone=f'forearm_fk{prefix}',
         constraint=default_constraints['DEFAULT_COPY_LOC_AND_ROT'],
     )
-    return wrist
 
 
 def get_leg_chain(prefix='.L'):
@@ -154,29 +153,28 @@ def get_leg_chain(prefix='.L'):
         raise ValueError
 
     hip = ChainElement(
-        obj=suffix + 'hip',
+        obj=f'{suffix}hip',
         parent=None,
-        target_bone='thigh_fk' + prefix,
+        target_bone=f'thigh_fk{prefix}',
         remap_bone='',
         constraint={},
     )
 
     knee = ChainElement(
-        obj=suffix + 'knee',
+        obj=f'{suffix}knee',
         parent=hip,
-        target_bone='shin_tweak' + prefix,
-        remap_bone='thigh_fk' + prefix,
+        target_bone=f'shin_tweak{prefix}',
+        remap_bone=f'thigh_fk{prefix}',
         constraint={},
     )
 
-    ankle = ChainElement(
-        obj=suffix + 'ankle',
+    return ChainElement(
+        obj=f'{suffix}ankle',
         parent=knee,
-        target_bone='foot_ik' + prefix,
-        remap_bone='shin_fk' + prefix,
+        target_bone=f'foot_ik{prefix}',
+        remap_bone=f'shin_fk{prefix}',
         constraint=default_constraints['LOCAL_COPY_LOC_AND_ROT'],
     )
-    return ankle
 
 
 ##################################################################

@@ -61,7 +61,7 @@ def create_actions(objects, overwrite: bool = True):
         # remove old action from objects animation data (default)
         action_data = bpy.data.actions
         if action_name in action_data:
-            if overwrite is True:
+            if overwrite:
                 action_data.remove(action_data[action_name])
             else:
                 actions.append(action_data[action_name])

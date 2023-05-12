@@ -40,8 +40,6 @@ class OT_UI_CGT_smooth_empties(bpy.types.Operator):
             bpy.ops.graph.smooth()
         except RuntimeError:
             logging.warning('Selection may not contain animation data to smooth.')
-            pass
-
         bpy.context.area.type = current_area
         for ob in objs:
             ob.select_set(False)
@@ -167,14 +165,12 @@ class OT_CGT_ObjectMinMax(bpy.types.Operator):
             if not any(_min) and not any(_max):
                 continue
             if name == 'rot':
-                msg.append(f"\n{name} in radians: "
-                           f"min {[round(m, 5) for m in _min]}, "
-                           f"max {[round(m, 5) for m in _max]}")
-
-                msg.append(f"\n{name} in degrees: "
-                           f"min {[round(degrees(m), 5) for m in _min]}, "
-                           f"max {[round(degrees(m), 5) for m in _max]}")
-
+                msg.extend(
+                    (
+                        f"\n{name} in radians: min {[round(m, 5) for m in _min]}, max {[round(m, 5) for m in _max]}",
+                        f"\n{name} in degrees: min {[round(degrees(m), 5) for m in _min]}, max {[round(degrees(m), 5) for m in _max]}",
+                    )
+                )
             else:
                 msg.append(f"\n{name}: min {[round(m, 5) for m in _min]}, max {[round(m, 5) for m in _max]}")
 
@@ -235,7 +231,10 @@ class OT_CGT_SaveObjectProperties(bpy.types.Operator):
             self.report({'ERROR'}, "Use a descriptive type name with at least 3 characters.")
             return {'CANCELLED'}
 
-        if any([True if ch in s else False for ch in ['*', '/', '"', "'", '$', '&', '´', '`', '°', '^', '@']]):
+        if any(
+            ch in s
+            for ch in ['*', '/', '"', "'", '$', '&', '´', '`', '°', '^', '@']
+        ):
             self.report({'ERROR'}, "Type name may not contain special characters.")
             return {'CANCELLED'}
 
@@ -272,7 +271,7 @@ class OT_CGT_LoadObjectProperties(bpy.types.Operator):
         armature = user.selected_rig
 
         if config in ['None', None] or armature is None:
-            self.report({'ERROR'}, f"No configuration file or no armature selected.")
+            self.report({'ERROR'}, "No configuration file or no armature selected.")
             return {'CANCELLED'}
 
         config += '.json'
@@ -324,7 +323,7 @@ class OT_CGT_ApplyObjectProperties(bpy.types.Operator):
         user = context.scene.cgtinker_transfer # noqa
         col = user.selected_driver_collection
         if col is None:
-            self.report({'ERROR'}, f"No driver collection selected.")
+            self.report({'ERROR'}, "No driver collection selected.")
             return {'CANCELLED'}
 
         bpy.ops.button.cgt_object_load_properties() # noqa

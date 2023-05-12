@@ -47,15 +47,17 @@ class HandRotationCalculator(cgt_nodes.CalculatorNode, calc_utils.ProcessorUtils
 
         self.data = data
         self.init_data()
-        if self.right_hand_data is not None:
-            if not self.has_duplicated_results(self.right_hand_data, "hand", 0):
-                locations[1] = self.right_hand_data
-                angles[1] = self.right_angles
+        if self.right_hand_data is not None and not self.has_duplicated_results(
+            self.right_hand_data, "hand", 0
+        ):
+            locations[1] = self.right_hand_data
+            angles[1] = self.right_angles
 
-        if self.left_hand_data is not None:
-            if not self.has_duplicated_results(self.left_hand_data, "hand", 1):
-                locations[0] = self.left_hand_data
-                angles[0] = self.left_angles
+        if self.left_hand_data is not None and not self.has_duplicated_results(
+            self.left_hand_data, "hand", 1
+        ):
+            locations[0] = self.left_hand_data
+            angles[0] = self.left_angles
 
         return [locations, angles, [[], []]], frame
 
@@ -142,9 +144,6 @@ class HandRotationCalculator(cgt_nodes.CalculatorNode, calc_utils.ProcessorUtils
             angle = cgt_math.angle_between(np.array(mcp_pip), np.array(mcp_closest))
             if dist < 0:
                 angle = -angle
-            else:
-                pass
-
             data[self.fingers[i + 1][0]] = angle
 
         return data
@@ -186,11 +185,7 @@ class HandRotationCalculator(cgt_nodes.CalculatorNode, calc_utils.ProcessorUtils
             return []
 
         # default hand rotation for a rigify A-Pose rig,
-        if orientation == "R":
-            rotation = [-60, 60, 0]
-        else:
-            rotation = [-60, -60, 0]
-
+        rotation = [-60, 60, 0] if orientation == "R" else [-60, -60, 0]
         # rotate points before calculating the rotation
         rotated_points = [cgt_math.rotate_point_euler(np.array(hand[idx][1]), rotation) for idx in [1, 5, 13]]
 

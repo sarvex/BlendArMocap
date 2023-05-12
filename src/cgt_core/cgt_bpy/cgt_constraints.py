@@ -35,9 +35,10 @@ def check_constraint(obj, **kwargs) -> bool:
     for obj_constraint in obj.constraints:
         cur_constraint = obj_constraint.name.upper().replace(' ', '_')
         # Check only if constraint types match
-        if cur_constraint == constraint_name:
-            if compare_kwargs(obj_constraint, **kwargs):
-                return True
+        if cur_constraint == constraint_name and compare_kwargs(
+            obj_constraint, **kwargs
+        ):
+            return True
     return False
 
 

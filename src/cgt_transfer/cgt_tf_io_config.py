@@ -26,9 +26,7 @@ class OT_CGT_Import_Transfer_Config(bpy.types.Operator):
         def current_files():
             path = Path(__file__).parent / 'data'
             files = [x for x in path.glob('**/*') if x.is_file()]
-            if len(files) == 0:
-                return ["None"]
-            return [str(x.name) for x in files]
+            return ["None"] if not files else [str(x.name) for x in files]
 
         from_path = Path(self.filepath)
         name = from_path.name

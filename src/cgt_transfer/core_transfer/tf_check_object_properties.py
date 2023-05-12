@@ -12,7 +12,7 @@ def check_value_mapping_generic_props(props: List[cgt_tf_object_properties.OBJEC
     main_prop = props[0]
     if main_prop.remap_default == 'DEFAULT':
         main_prop.remap_default = 'XYZ'
-    target_axis = [axis for axis in main_prop.remap_default]
+    target_axis = list(main_prop.remap_default)
 
     for tar_axis, prop in zip(target_axis, props):
         if not prop.active:
@@ -40,7 +40,7 @@ def check_value_mapping_detail_props(props: List[cgt_tf_object_properties.OBJECT
 
     active_props = [prop for prop in props if prop.active]
 
-    if not len(set(active_props)) == len(active_props):
+    if len(set(active_props)) != len(active_props):
         logging.error(f"Internal Error, active properties don't match expected properties. {props[0].id_data}")
         raise RuntimeError
     return props
@@ -56,7 +56,7 @@ def check_distance_mapping_object_props(props: cgt_tf_object_properties.OBJECT_P
         props.remap_to_obj
     ]
 
-    if not all([True if ob is not None else False for ob in objects]):
+    if any(ob is None for ob in objects):
         logging.error(f"All object pointers for distance remapping have to be set. {props.id_data}")
         raise RuntimeError
     return props

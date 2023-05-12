@@ -44,13 +44,15 @@ class DetectorNode(cgt_nodes.InputNode):
         self.stream.update()
         updated = self.stream.updated
 
-        if not updated and self.stream.input_type == 0:
-            # ignore if an update fails while stream detection
-            return self.empty_data()
+        if self.stream.input_type == 0:
+            if not updated:
+                # ignore if an update fails while stream detection
+                return self.empty_data()
 
-        elif not updated and self.stream.input_type == 1:
-            # stop detection if update fails while movie detection
-            return None
+        elif self.stream.input_type == 1:
+            if not updated:
+                # stop detection if update fails while movie detection
+                return None
 
         if self.stream.frame is None:
             # ignore frame if not available
@@ -65,19 +67,13 @@ class DetectorNode(cgt_nodes.InputNode):
         # proceed if contains features
         if not self.contains_features(mp_res):
             self.stream.draw()
-            if self.stream.exit_stream():
-                return None
-            return self.empty_data()
-
+            return None if self.stream.exit_stream() else self.empty_data()
         # draw results
         self.draw_result(self.stream, mp_res, self.drawing_utils)
         self.stream.draw()
 
         # exit stream
-        if self.stream.exit_stream():
-            return None
-
-        return self.detected_data(mp_res)
+        return None if self.stream.exit_stream() else self.detected_data(mp_res)
 
     def cvt2landmark_array(self, landmark_list):
         """landmark_list: A normalized landmark list proto message to be annotated on the image."""

@@ -15,10 +15,8 @@ class RuntimeClass:
         s = ["{"]
         for k, v in self.__dict__.items():
             if isinstance(v, RuntimeClass):
-                s.append(f"\n\t{k}: ")
-                s.append("{")
-                for nk, nv in v.__dict__.items():
-                    s.append(f"\n\t\t{nk}: {nv},")
+                s.extend((f"\n\t{k}: ", "{"))
+                s.extend(f"\n\t\t{nk}: {nv}," for nk, nv in v.__dict__.items())
                 s.append("\n\t},")
 
             else:

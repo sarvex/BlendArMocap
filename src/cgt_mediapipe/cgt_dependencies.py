@@ -30,7 +30,7 @@ def get_python_exe():
             executable = sys.executable
 
     # some version the path points to the binary path instead of the py executable
-    if executable == bpy.app.binary_path or executable == None:
+    if executable == bpy.app.binary_path or executable is None:
         py_path = Path(sys.prefix) / "bin"
         py_exec = next(py_path.glob("python*"))  # first file that starts with "python" in "bin" dir
         executable = str(py_exec)
@@ -53,8 +53,7 @@ def get_site_packages_path():
     # recv search for site packages
     if bpy.app.version >= (3, 0, 0):
         python_directory = Path(bpy.utils.system_resource('PYTHON'))
-        site_package_path = [path for path in python_directory.rglob('site-packages')]
-        if len(site_package_path) >= 1:
+        if site_package_path := list(python_directory.rglob('site-packages')):
             return str(site_package_path[0])
 
     # return script path and hope for the best
@@ -169,7 +168,7 @@ def uninstall_dependency(self: bpy.types.Operator, dependency: Dependency) -> bo
     # check if .pth file in site packages
     pth_file = None
     for path in Path(site_packages).iterdir():
-        if not path.suffix == '.pth':
+        if path.suffix != '.pth':
             continue
         if canonize_path(path.stem).startswith(canonize_path(dependency.pkg)):
             pth_file = path
@@ -219,7 +218,7 @@ def ensure_pip(self: bpy.types.Operator) -> bool:
     if is_installed(Dependency("pip", "pip", "pip", "pip")):
         return True
 
-    logging.info(f"Attempt to install pip.")
+    logging.info("Attempt to install pip.")
     try:
         # https://github.com/robertguetzkow/blender-python-examples/blob/master/add-ons/install-dependencies/install-dependencies.py
         import ensurepip
@@ -298,9 +297,7 @@ def is_installed(dependency: Dependency) -> bool:
         return False
 
     # only accept it as valid if there is a source file for the module - not bytecode only.
-    if issubclass(type(spec), importlib.machinery.ModuleSpec):
-        return True
-    return False
+    return issubclass(type(spec), importlib.machinery.ModuleSpec)
 # endregion
 
 

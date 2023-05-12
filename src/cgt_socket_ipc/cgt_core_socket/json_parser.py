@@ -86,8 +86,7 @@ class JsonParser(object):
         for i in range(0, length):
             sub_arr = []
             try:
-                for j in ["x", "y", "z"]:
-                    sub_arr.append(data[str(i)][j])
+                sub_arr.extend(data[str(i)][j] for j in ["x", "y", "z"])
                 arr.append([i, sub_arr])
             except KeyError:
                 break

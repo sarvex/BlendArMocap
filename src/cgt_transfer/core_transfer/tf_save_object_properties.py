@@ -26,8 +26,6 @@ def convert_object_ptrs2str(cls) -> None:
                         f"Armature targets don't match in cls which may lead to errors when importing: \n{cls}")
 
             setattr(cls, key, [value.name, value.type])
-        else:
-            pass
 
 
 def convert_cls2dict(cls, d: dict) -> None:
@@ -49,9 +47,6 @@ def delete_typeof_none(cls) -> None:
             delete_typeof_none(value)
         elif value is None:
             removable_attrs.append((cls, key))
-        else:
-            pass
-
     for cls, key in removable_attrs:
         delattr(cls, key)
 
@@ -65,9 +60,6 @@ def delete_id_data(cls) -> None:
             removable_attrs.append((cls, key))
         if isinstance(value, tf_reflect_object_properties.RuntimeClass):
             delete_id_data(value)
-        else:
-            pass
-
     for cls, key in removable_attrs:
         delattr(cls, key)
 
@@ -122,7 +114,7 @@ def save(objs: List[bpy.types.Object]) -> cgt_json.JsonData:
                 # remove default values
                 sub_cls = getattr(props, axis, None)
                 for key, value in remap_defaults.items():
-                    if not getattr(sub_cls, key, value) == value:
+                    if getattr(sub_cls, key, value) != value:
                         continue
                     delattr(sub_cls, key)
 
@@ -151,24 +143,21 @@ def save(objs: List[bpy.types.Object]) -> cgt_json.JsonData:
         delete_id_data(props)
 
         # convert cls to dict
-        cls_dict = dict()
+        cls_dict = {}
         convert_cls2dict(props, cls_dict)
 
         # get constraints
         constraints = [(c.type, tf_get_object_properties.get_constraint_props(c)) for c in obj.constraints]
 
         # id_name contains 'object name' and 'object type', get in first lvl depth for easier loading
-        properties[id_name[0]] = {}
-        properties[id_name[0]]['cgt_props'] = cls_dict
-        properties[id_name[0]]['constraints'] = constraints
-
-        if obj.users_collection:
-            properties[id_name[0]]['collection'] = obj.users_collection[0].name
-        else:
-            properties[id_name[0]]['collection'] = "cgt_DRIVERS"
-
-    json_data = cgt_json.JsonData(**properties)
-    return json_data
+        properties[id_name[0]] = {
+            'cgt_props': cls_dict,
+            'constraints': constraints,
+            'collection': obj.users_collection[0].name
+            if obj.users_collection
+            else "cgt_DRIVERS",
+        }
+    return cgt_json.JsonData(**properties)
 
 
 def test():

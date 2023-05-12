@@ -11,26 +11,23 @@ from . import tf_check_object_properties, tf_reflect_object_properties
 # driver_prop_cls_dict = None
 def get_properties_from_object(obj: bpy.types.Object) -> tf_reflect_object_properties.RuntimeClass():
     """ Get properties from object as Runtime Class to not modify values in Blender by accident. """
-    # global driver_prop_cls_dict
-    # if driver_prop_cls_dict is None:
-    #     driver_prop_cls_dict = object_prop_reflection.copy_ptr_prop_cls(object_prop_reflection.cls_type_dict)
-
-    properties = tf_reflect_object_properties.get_object_attributes(
+    return tf_reflect_object_properties.get_object_attributes(
         # driver_prop_cls_dict["OBJECT_PGT_CGT_TransferProperties"],
         cgt_tf_object_properties.TransferPropertiesProto,
         obj.cgt_props,
-        tf_reflect_object_properties.RuntimeClass()
+        tf_reflect_object_properties.RuntimeClass(),
     )
-
-    return properties
 
 
 def get_constraint_props(c: bpy.types.Constraint):
     pool = {'target', 'type', 'subtarget', 'is_valid', 'active', 'bl_rna', 'error_location', 'error_rotation',
             'head_tail', 'is_proxy_local', 'mute', 'rna_type', 'show_expanded', 'use_bbone_shape',
             'is_override_data'}
-    props = {key: getattr(c, key, None) for key in dir(c) if key not in pool and not key.startswith('_')}
-    return props
+    return {
+        key: getattr(c, key, None)
+        for key in dir(c)
+        if key not in pool and not key.startswith('_')
+    }
 
 
 def get_target(tar_props: cgt_tf_object_properties.OBJECT_PGT_CGT_TransferTarget) -> Tuple[Optional[bpy.types.Object], Optional[Any], str]:
@@ -41,24 +38,37 @@ def get_target(tar_props: cgt_tf_object_properties.OBJECT_PGT_CGT_TransferTarget
     if tar_props.obj_type == 'ANY':
         return tar_props.target, None, 'ANY'
 
-    elif tar_props.obj_type == 'MESH':
-        if tar_props.object_type == 'OBJECT':
-            return tar_props.target, None, 'OBJECT'
-
-        elif tar_props.object_type == 'SHAPE_KEY':
-            if tar_props.target_shape_key not in tar_props.target.data.shape_keys.key_blocks:
-                return None, None, 'ABORT'
-            return tar_props.target, tar_props.target.data.shape_keys.key_blocks[
-                tar_props.target_shape_key], 'SHAPE_KEY'
-
     elif tar_props.obj_type == 'ARMATURE':
         if tar_props.armature_type == 'ARMATURE':
             return tar_props.target, None, 'ARMATURE'
 
         elif tar_props.armature_type == 'BONE':
-            if tar_props.target_bone not in tar_props.target.pose.bones:
-                return None, None, 'ABORT'
-            return tar_props.target, tar_props.target.pose.bones[tar_props.target_bone], 'BONE'
+            return (
+                (None, None, 'ABORT')
+                if tar_props.target_bone not in tar_props.target.pose.bones
+                else (
+                    tar_props.target,
+                    tar_props.target.pose.bones[tar_props.target_bone],
+                    'BONE',
+                )
+            )
+    elif tar_props.obj_type == 'MESH':
+        if tar_props.object_type == 'OBJECT':
+            return tar_props.target, None, 'OBJECT'
+
+        elif tar_props.object_type == 'SHAPE_KEY':
+            return (
+                (None, None, 'ABORT')
+                if tar_props.target_shape_key
+                not in tar_props.target.data.shape_keys.key_blocks
+                else (
+                    tar_props.target,
+                    tar_props.target.data.shape_keys.key_blocks[
+                        tar_props.target_shape_key
+                    ],
+                    'SHAPE_KEY',
+                )
+            )
     assert RuntimeError, f'Type not defined. \n{tar_props}'
 
 

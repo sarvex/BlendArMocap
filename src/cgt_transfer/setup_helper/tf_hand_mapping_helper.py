@@ -110,7 +110,7 @@ def set_hand_properties(rig: bpy.types.Armature, prefix: str = '.L'):
     for i, entry in enumerate(refs.items()):
         # reference object names
         k, v = entry
-        ob_name = 'cgt_' + k + prefix
+        ob_name = f'cgt_{k}{prefix}'
         bone = v + prefix
 
         # get ob and clear constraints

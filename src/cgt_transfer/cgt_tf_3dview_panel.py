@@ -22,9 +22,7 @@ class CgtRigifyTransferProperties(bpy.types.PropertyGroup):
     )
 
     def is_armature(self, object):
-        if object.type == 'ARMATURE':
-            return True
-        return False
+        return object.type == 'ARMATURE'
 
     selected_rig: bpy.props.PointerProperty(
         type=bpy.types.Object,
@@ -35,10 +33,10 @@ class CgtRigifyTransferProperties(bpy.types.PropertyGroup):
     def json_files(self, context):
         path = Path(__file__).parent / 'data'
 
-        files = [x for x in path.glob('**/*') if x.is_file()]
-        if len(files) == 0:
+        if files := [x for x in path.glob('**/*') if x.is_file()]:
+            return [(str(x.name)[:-5], str(x.name)[:-5], "") for x in files]
+        else:
             return [('None', 'None', "")]
-        return [(str(x.name)[:-5], str(x.name)[:-5], "") for x in files]
 
     transfer_types: bpy.props.EnumProperty(
         name="Target Type",

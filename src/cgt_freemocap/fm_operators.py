@@ -87,12 +87,11 @@ class WM_Load_Freemocap_Operator(bpy.types.Operator):
     def modal(self, context, event):
         """ Run detection as modal operation, finish with 'Q', 'ESC' or 'RIGHT MOUSE'. """
         if event.type == "TIMER":
-            if self.user.modal_active:
-                self.session_loader.update()
-                return {'PASS_THROUGH'}
-            else:
+            if not self.user.modal_active:
                 return self.cancel(context)
 
+            self.session_loader.update()
+            return {'PASS_THROUGH'}
         if event.type in {'Q', 'ESC', 'RIGHT_MOUSE'} or self.user.modal_active is False:
             return self.cancel(context)
         return {'PASS_THROUGH'}
@@ -165,7 +164,7 @@ class WM_FMC_load_synchronized_videos(bpy.types.Operator):
                 bpy.ops.import_image.to_plane(files=[{"name": thisVidPath.name}], directory=str(thisVidPath.parent),
                                               shader='EMISSION', )
                 this_vid_as_plane = bpy.context.active_object
-                this_vid_as_plane.name = 'vid_' + str(vid_number)
+                this_vid_as_plane.name = f'vid_{str(vid_number)}'
 
                 vid_x = (vid_number - number_of_videos / 2) * vid_location_scale
 
@@ -174,12 +173,12 @@ class WM_FMC_load_synchronized_videos(bpy.types.Operator):
                 this_vid_as_plane.scale = [vid_location_scale * 1.5] * 3
                 this_vid_as_plane.parent = world_origin
 
-                # create a light
-                # bpy.ops.object.light_add(type='POINT', radius=1, align='WORLD')
+                        # create a light
+                        # bpy.ops.object.light_add(type='POINT', radius=1, align='WORLD')
         except Exception as e:
             self.report({'ERROR'}, f'Failed to load videos to Blender scene. {e}')
             return {'CANCELLED'}
-        self.report({'INFO'}, f"Imported session videos as planes.")
+        self.report({'INFO'}, "Imported session videos as planes.")
         return {'FINISHED'}
 
 

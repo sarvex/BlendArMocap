@@ -13,9 +13,7 @@ def set_viewport_visibility(collection_name: str, active: bool) -> None:
 
 def collection_exists(collection_name: str) -> bool:
     """ Returns if the collection exists. """
-    if bpy.data.collections.get(collection_name) is not None:
-        return True
-    return False
+    return bpy.data.collections.get(collection_name) is not None
 
 
 def get_collection(collection_name: str) -> bpy.types.Collection:
@@ -46,7 +44,7 @@ def remove_collection(collection_name: str, remove_objects: bool = True) -> None
     obs = []
     if remove_objects:
         obs = [o for o in collection.cgt_bpy_utils if o.users == 1]
-    while len(obs) > 0:
+    while obs:
         bpy.data.objects.remove(obs.pop())
 
     bpy.data.collections.remove(collection)
@@ -102,7 +100,7 @@ def get_objects_from_collection(col_name):
     """ Returns objects from collection. """
     if collection_exists(col_name):
         col = bpy.data.collections[col_name]
-        return [ob for ob in col.all_objects]
+        return list(col.all_objects)
     else:
         return None
 

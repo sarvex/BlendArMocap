@@ -81,11 +81,13 @@ class CGT_PT_MP_Warning(cgt_core_panel.DefaultPanel, bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
-        lines = [f"Please install the missing dependencies for BlendArMocap.",
-                 f"1. Open the preferences (Edit > Preferences > Add-ons).",
-                 f"2. Search for the BlendArMocap add-on.",
-                 f"3. Open the details section of the add-on.",
-                 f"4. Click on the 'install dependencies' button."]
+        lines = [
+            "Please install the missing dependencies for BlendArMocap.",
+            "1. Open the preferences (Edit > Preferences > Add-ons).",
+            "2. Search for the BlendArMocap add-on.",
+            "3. Open the details section of the add-on.",
+            "4. Click on the 'install dependencies' button.",
+        ]
 
         for line in lines:
             layout.label(text=line)

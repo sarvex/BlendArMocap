@@ -12,9 +12,7 @@ class MPFaceOutputNode(mp_out_utils.BpyOutputNode):
     def __init__(self):
         data = cgt_defaults
 
-        references = {}
-        for i in range(468):
-            references[f'{i}'] = f"cgt_face_vertex_{i}"
+        references = {f'{i}': f"cgt_face_vertex_{i}" for i in range(468)}
         for k, name in data.face.items():
             references[f'{468+int(k)}'] = name
 
@@ -23,7 +21,9 @@ class MPFaceOutputNode(mp_out_utils.BpyOutputNode):
             cgt_object_prop.set_custom_property(ob, "cgt_id", data.identifier)
 
         cgt_collection.add_list_to_collection(self.col_name, self.face[468:], self.parent_col)
-        cgt_collection.add_list_to_collection(self.col_name+"_DATA", self.face[:468], self.col_name)
+        cgt_collection.add_list_to_collection(
+            f"{self.col_name}_DATA", self.face[:468], self.col_name
+        )
 
     def update(self, data, frame):
         loc, rot, sca = data

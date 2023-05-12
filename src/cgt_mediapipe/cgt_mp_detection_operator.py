@@ -75,7 +75,7 @@ class WM_CGT_MP_modal_detection_operator(bpy.types.Operator):
                 logging.error(f"GIVEN PATH IS NOT VALID {mov_path}")
                 return {'FINISHED'}
 
-            stream = cv_stream.Stream(str(mov_path), "Movie Detection")
+            return cv_stream.Stream(str(mov_path), "Movie Detection")
 
         else:
             camera_index = self.user.webcam_input_device
@@ -87,11 +87,12 @@ class WM_CGT_MP_modal_detection_operator(bpy.types.Operator):
             }
             backend = int(self.user.enum_stream_type)
 
-            stream = cv_stream.Stream(
-                capture_input=camera_index, backend=backend,
-                width=dimensions[dim][0], height=dimensions[dim][1],
+            return cv_stream.Stream(
+                capture_input=camera_index,
+                backend=backend,
+                width=dimensions[dim][0],
+                height=dimensions[dim][1],
             )
-        return stream
 
     def execute(self, context):
         """ Runs movie or stream detection depending on user input. """
@@ -141,10 +142,10 @@ class WM_CGT_MP_modal_detection_operator(bpy.types.Operator):
                 print("CATCHED NOT LIST ERR")
                 return False
 
-            if not len(x) == 2 or not len(y) == 2:
+            if len(x) != 2 or len(y) != 2:
                 return False
 
-            if not len(x[1]) == 3 or not len(y[1]) == 3:
+            if len(x[1]) != 3 or len(y[1]) != 3:
                 return False
 
             smooth_by_add_divide(x[1], y[1])

@@ -73,13 +73,17 @@ class FreemocapLoader:
 
         objs = []
         for i in range(0, self.first_left_hand_point):
-            ob = cgt_bpy_utils.add_empty(0.01, 'cgt_' + json.pose[str(i)])
+            ob = cgt_bpy_utils.add_empty(0.01, f'cgt_{json.pose[str(i)]}')
             objs.append(ob)
         for i in range(self.first_left_hand_point, self.first_right_hand_point):
-            ob = cgt_bpy_utils.add_empty(0.01, 'cgt_' + json.hand[str(i - self.first_left_hand_point)] + '.L')
+            ob = cgt_bpy_utils.add_empty(
+                0.01, f'cgt_{json.hand[str(i - self.first_left_hand_point)]}.L'
+            )
             objs.append(ob)
         for i in range(self.first_right_hand_point, self.first_face_point):
-            ob = cgt_bpy_utils.add_empty(0.01, 'cgt_' + json.hand[str(i - self.first_right_hand_point)] + '.R')
+            ob = cgt_bpy_utils.add_empty(
+                0.01, f'cgt_{json.hand[str(i - self.first_right_hand_point)]}.R'
+            )
             objs.append(ob)
         for i in range(self.first_face_point, self.mediapipe3d_frames_trackedPoints_xyz.shape[1]):
             ob = cgt_bpy_utils.add_empty(0.01, f'cgt_face_vertex_{str(i - self.first_face_point)}')
@@ -121,7 +125,7 @@ class FreemocapLoader:
 
         def split_transform_data(transform, m_frame):
             """ Returns locs and rots [[n (objs)], [x, y, z, idx, frame]] """
-            if not len(transform.shape) > 1:
+            if len(transform.shape) <= 1:
                 return np.array([])
             return np.array([np.array([*x, i, m_frame]) for x, i in zip(transform[:, 1], transform[:, 0])])
 
@@ -151,7 +155,7 @@ class FreemocapLoader:
 
                 transform_data = [left_loc_data, right_loc_data, left_rot_data, right_rot_data]
                 for arr, data in zip(transform_arrays, transform_data):
-                    if not len(data) > 0:
+                    if len(data) <= 0:
                         continue
                     arr.append(split_transform_data(data, m_frame))
 
@@ -204,7 +208,7 @@ class FreemocapLoader:
 
         tracked_points = self.mediapipe3d_frames_trackedPoints_xyz[frame, :, :]
 
-        this_frame_body_data = tracked_points[0:self.first_left_hand_point]
+        this_frame_body_data = tracked_points[:self.first_left_hand_point]
         this_frame_left_hand_data = tracked_points[self.first_left_hand_point:self.first_right_hand_point]
         this_frame_right_hand_data = tracked_points[self.first_right_hand_point:self.first_face_point]
         this_frame_face_data = tracked_points[self.first_face_point:]
@@ -214,16 +218,17 @@ class FreemocapLoader:
         this_frame_right_hand_data = list(enumerate(this_frame_right_hand_data))
         this_frame_face_data = list(enumerate(this_frame_face_data))
 
-        holistic_data = [[[this_frame_left_hand_data], [this_frame_right_hand_data]],
-                         [this_frame_face_data], this_frame_body_data]
-        return holistic_data
+        return [
+            [[this_frame_left_hand_data], [this_frame_right_hand_data]],
+            [this_frame_face_data],
+            this_frame_body_data,
+        ]
 
 
 def main():
     path = '/Users/Scylla/Downloads/sesh_2022-09-19_16_16_50_in_class_jsm/'
     loader = FreemocapLoader(path, False)
     loader.quickload_processed()
-    pass
 
 
 if __name__ == '__main__':

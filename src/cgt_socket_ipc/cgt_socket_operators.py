@@ -43,7 +43,7 @@ class WM_CGT_mediapipe_data_socket_operator(bpy.types.Operator):
         context.window_manager.modal_handler_add(self)
 
         context.scene.m_cgtinker_mediapipe.connection_operator_running = True
-        print(f"RUNNING CONNECTION AS MODAL OPERATION")
+        print("RUNNING CONNECTION AS MODAL OPERATION")
         return {'RUNNING_MODAL'}
 
     @classmethod
@@ -54,9 +54,7 @@ class WM_CGT_mediapipe_data_socket_operator(bpy.types.Operator):
         """ Server runs on separate thread and pushes results in queue,
             The results are getting processed and linked to blender. """
         if event.type == "TIMER":
-            # putting message in cgt_icp/chunk_parser
-            payload = self.queue.get()
-            if payload:
+            if payload := self.queue.get():
                 if payload == "DONE":
                     return self.cancel(context)
                 # payload contains capture results and the corresponding frame

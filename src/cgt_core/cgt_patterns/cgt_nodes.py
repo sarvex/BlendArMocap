@@ -18,7 +18,7 @@ class NodeChain(Node):
     nodes: List[Node]
 
     def __init__(self):
-        self.nodes = list()
+        self.nodes = []
 
     # @timeit
     def update(self, data: Any, frame: int) -> Tuple[Optional[Any], int]:
@@ -50,7 +50,7 @@ class NodeChainGroup(Node):
     nodes: List[NodeChain]
 
     def __init__(self):
-        self.nodes = list()
+        self.nodes = []
 
     # @timeit
     def update(self, data: Any, frame: int) -> Tuple[Optional[Any], int]:

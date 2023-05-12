@@ -27,9 +27,7 @@ class FaceDetector(DetectorNode):
         return [self.cvt2landmark_array(landmark) for landmark in mp_res.multi_face_landmarks]
 
     def contains_features(self, mp_res):
-        if not mp_res.multi_face_landmarks:
-            return False
-        return True
+        return bool(mp_res.multi_face_landmarks)
 
     @staticmethod
     def get_custom_face_mesh_contours_style() -> Mapping[Tuple[int, int], DrawingSpec]:

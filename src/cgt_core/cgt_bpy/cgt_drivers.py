@@ -150,12 +150,12 @@ class DriverFactory:
             params target: Property or Object in Blender with accessible data path.
             params type: Driver type to use. ['MAX', 'MIN', 'AVERAGE', 'SCRIPTED', 'SUM'], default = SCRIPTED.
         """
-        assert type in ['MAX', 'MIN', 'AVERAGE', 'SCRIPTED', 'SUM']
+        assert type in {'MAX', 'MIN', 'AVERAGE', 'SCRIPTED', 'SUM'}
         self.type = type
         self.target = target
         self.expressions = {}
         self._driver_variables = {}
-        self.variables = list()
+        self.variables = []
 
     def add_variable(self, variable: Variable, path: str, idx: int):
         """ Adds driver variable. """
@@ -202,9 +202,7 @@ class DriverFactory:
         """ Checks if path and idx are in the driver variables dict. """
         if path not in self._driver_variables.keys():
             return False
-        if idx not in self._driver_variables[path].keys():
-            return False
-        return True
+        return idx in self._driver_variables[path].keys()
 
     def driver_add_variable(self, path, idx):
         if idx == -1:

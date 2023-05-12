@@ -22,9 +22,7 @@ def add_empty(size, name, display='ARROWS') -> bpy.types.Object:
 
 
 def get_object_by_name(name) -> Optional[bpy.types.Object]:
-    if name in bpy.data.objects:
-        return bpy.data.objects[name]
-    return None
+    return bpy.data.objects[name] if name in bpy.data.objects else None
 
 
 def purge_orphan_data():
@@ -44,14 +42,12 @@ def get_pbone_worldspace(
         rig: bpy.types.Object) -> List[float]:
     """ Gets world space position of a pose bone. """
 
-    world_space = rig.convert_space(
+    return rig.convert_space(
         pose_bone=pose_bone,
         matrix=pose_bone.matrix,
         from_space='POSE',
-        to_space='WORLD'
+        to_space='WORLD',
     )
-
-    return world_space
 
 
 def set_pbone_worldspace(

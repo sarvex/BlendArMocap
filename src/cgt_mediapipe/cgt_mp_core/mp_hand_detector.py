@@ -45,9 +45,7 @@ class HandDetector(DetectorNode):
         return [left_hand_data, right_hand_data]
 
     def contains_features(self, mp_res):
-        if not mp_res.multi_hand_landmarks and not mp_res.multi_handedness:
-            return False
-        return True
+        return bool(mp_res.multi_hand_landmarks or mp_res.multi_handedness)
 
     def draw_result(self, s, mp_res, mp_drawings):
         for hand in mp_res.multi_hand_landmarks:

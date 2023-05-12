@@ -27,9 +27,7 @@ def get_reload_list(sub_dirs):
         files = [p for p in sub_dir.rglob("*.py") if not p.stem.startswith('_')]
         for file in files:
             parents = get_parents(file, [])
-            imp_path = ""
-            for parent in reversed(parents):
-                imp_path += f".{parent}"
+            imp_path = "".join(f".{parent}" for parent in reversed(parents))
             imp_path += f".{file.stem}"
             reload_list.append(imp_path)
     return reload_list
@@ -53,7 +51,7 @@ def manage_imports(dirs: list = None):
         reload = True
         try:
             import_module(module)
-        except (ModuleNotFoundError, ImportError) as e:
+        except ImportError as e:
             reload = False
             logging.error(f"Import {module} failed: {e}")
 
